@@ -100,6 +100,21 @@ async function run() {
     })
 
 
+
+         // get the role of an user 
+         app.get('/user/:email', async(req, res)=>{
+         try{
+          const email = req.params.email
+          const query = {email : email}
+          const user = await usersCollection.findOne(query)
+          res.send(user)
+
+         }catch(err){
+          console.log(err)
+         }
+      })
+
+
 } 
 catch(err){
     console.log(`${err}`.red);
