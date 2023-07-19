@@ -48,14 +48,14 @@ async function run() {
         try{
             const existingUser = await  usersCollection.findOne({email: email})
             if(existingUser){
-             return res.send('Email already exist  ')
+             return res.send({success: false, message: "Email already Exist"})
 
             }
             else{
               const result = await usersCollection.insertOne({name, email, password, role, phoneNumber, image})
             const token = jwt.sign({email: result.email, id: result._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
             console.log(result);
-            res.send({message: 'User created', token: token, userInfo:{name, email, image, phoneNumber, role}})
+            res.send({success: true, message: 'User created', token: token, userInfo:{name, email, image, phoneNumber, role}})
             }
 
         }
@@ -71,7 +71,7 @@ async function run() {
       try{
         const existingUser = await usersCollection.findOne({email: {$eq: email}})
         if(!existingUser){
-          return res.status(400).send("User Not found")
+          return res.status(400).send({success: false, message: "User Not found"})
         }else{
             const matchedPassword = existingUser?.password
             if(matchedPassword == password){
@@ -80,12 +80,11 @@ async function run() {
               delete existingUser?._id
               return res.send({success: true,message:"Login successfull", token: token , userInfo: existingUser})
             }
-            console.log(result);
          res.send({success: false, message: "wrong password"})
         }
       }
       catch(err){
-        console.log(err)
+        console.log('error in login : ',err)
         res.status(400).send('Server Error')
       }
     })
